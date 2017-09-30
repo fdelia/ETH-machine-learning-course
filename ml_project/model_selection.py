@@ -1,6 +1,7 @@
 from sklearn.model_selection import GridSearchCV
 import pandas as pd
 from os.path import normpath
+import numpy as np
 
 
 class GridSearchCV(GridSearchCV):
@@ -31,6 +32,9 @@ class GridSearchCV(GridSearchCV):
             "mean_test_score": self.cv_results_["mean_test_score"],
             "std_test_score": self.cv_results_["std_test_score"],
         }
+
+        print("mean:", np.mean(data["mean_test_score"]), " std:", np.mean(data["std_test_score"]))
+        
         df = pd.DataFrame.from_dict(pd.io.json.json_normalize(data))
         df.to_csv(normpath(self.save_path+"GridSearchCV.csv"))
 

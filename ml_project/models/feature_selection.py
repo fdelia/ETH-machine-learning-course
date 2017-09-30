@@ -29,3 +29,17 @@ class RandomSelection(BaseEstimator, TransformerMixin):
         X_new = X[:, self.components]
 
         return X_new
+
+# first 650k values and last 750k values are always 0, drop them
+class RemoveEmptyValues(BaseEstimator, TransformerMixin):
+    def __init__(self):
+        pass
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X, y=None):
+        X_new = []
+        for i in range(0, len(X)):
+            X_new.append(X[i][650000 : -750000])
+        return X_new

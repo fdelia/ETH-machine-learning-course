@@ -1,0 +1,37 @@
+module: ml_project.pipeline
+class: Pipeline
+params:
+  class_list:
+    - module: ml_project.models.feature_selection
+      class: RemoveEmptyValues
+
+    # full, randomSelection 1000, mean: 0.706398726566  std: 0.00709549359157
+   #  - module: ml_project.models.feature_selection
+   #    class: RandomSelection
+   #    params:
+   #      random_state: 37
+   #      n_components: 1000
+
+    # full, mean: 0.863778528597, std: 0.00486466587765
+   #  - module: ml_project.models.feature_extraction
+   #    class: StatsExtraction
+   #    params:
+   #      bins: 10
+
+   #  mean: 0.845356423781  std: 0.0166878729634
+    - module: ml_project.models.feature_extraction
+      class: BinsExtraction
+      params:
+        bin_length: 70 # (opt in 60-80 somewhere)
+
+   #  - module: sklearn.decomposition
+   #    class: PCA
+   #    params:
+   #      random_state: 37
+
+    - module: sklearn.preprocessing
+      class: StandardScaler
+    - module: sklearn.linear_model
+      class: LinearRegression
+      params:
+        n_jobs: -1

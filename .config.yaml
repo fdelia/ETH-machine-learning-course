@@ -1,0 +1,78 @@
+
+# Using this to try around and get an offline score for my model
+#smt run --config .config.yaml -X data/X_train.npy -y data/y_1.csv -a fit
+module: ml_project.model_selection
+class: GridSearchCV
+params:
+ est_module: ml_project.pipeline
+ est_class: Pipeline
+ est_params:
+   - module: ml_project.models.feature_selection
+     class: RemoveEmptyValues
+
+   # full, randomSelection 1000, mean: 0.706398726566  std: 0.00709549359157
+  #  - module: ml_project.models.feature_selection
+  #    class: RandomSelection
+  #    params:
+  #      random_state: 37
+  #      n_components: 1000
+
+   # full, mean: 0.863778528597, std: 0.00486466587765
+  #  - module: ml_project.models.feature_extraction
+  #    class: StatsExtraction
+  #    params:
+  #      bins: 10
+
+  #  60, mean: 0.845356423781  std: 0.0166878729634
+  #  70, removeEmptyValues, mean: 0.713048352206  std: 0.0617523270325
+  # 150, removeEmptyValues, mean: 0.72933134527  std: 0.0892725570146
+   - module: ml_project.models.feature_extraction
+     class: BinsExtraction
+     params:
+       bin_length: 70 # (opt in 60-80 somewhere)
+
+  #  - module: sklearn.decomposition
+  #    class: PCA
+  #    params:
+  #      random_state: 37
+
+   - module: sklearn.preprocessing
+     class: StandardScaler
+  #  - module: sklearn.linear_model
+  #    class: LinearRegression
+  #    params:
+  #      n_jobs: -1
+
+  # 0.1, 0.4, 50 with bin_l 70:
+   - module: sklearn.ensemble
+     class: GradientBoostingRegressor
+     params:
+      learning_rate: 0.1
+      max_depth: 0.4
+      n_estimators: 50
+
+ param_grid:
+   GradientBoostingRegressor__learning_rate:
+     - 1
+     - 0.1
+     - 0.01
+   GradientBoostingRegressor__max_depth:
+     - 0.3
+     - 0.4
+     - 0.5
+   #  BinsExtraction__bin_length:
+   #    - 70
+  #  StatsExtraction__bins:
+  #    - 10
+  #    - 30
+  #  PCA__n_components:
+    #  - 100
+  #  RandomSelection__n_components:
+  #   - 1000
+ cv:
+   module: sklearn.model_selection
+   class: KFold
+   params:
+     n_splits: 2
+     shuffle: True
+     random_state: 37
