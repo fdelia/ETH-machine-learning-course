@@ -30,7 +30,7 @@ class RandomSelection(BaseEstimator, TransformerMixin):
 
         return X_new
 
-# Build n bins for hist of values
+# Build n bins from hist/distribution of values
 # Number of values between x, x+1
 class StatsExtraction(BaseEstimator, TransformerMixin):
     def __init__(self, bins=10):
@@ -61,7 +61,7 @@ class StatsExtraction(BaseEstimator, TransformerMixin):
 
         return np.array(X_new)
 
-# Build n bins with mean for values
+# Build n bins with mean from values
 class BinsExtraction(BaseEstimator, TransformerMixin):
     def __init__(self, bin_length=3):
         self.bin_length = bin_length
@@ -71,12 +71,20 @@ class BinsExtraction(BaseEstimator, TransformerMixin):
 
     def transform(self, X, y=None):
         X_new = []
-        l = self.bin_length
+        num_bins = int(len(X[0]) / self.bin_length) # int() same as floor()
+
+        # bins = 50
+        # l = int(1600/bins)
 
         for row in X:
-            row_new = []
-            for i in range(0, int(len(row) / l) - 1):
-                row_new.append(np.mean(row[i*l : (i+1)*l]))
-            X_new.append(row_new)
+            row = row[0 : num_bins*self.bin_length] # crop last elements, they are probably 0 anyway
+            splits = np.split(row, num_bins)
+            # X_new.append(np.concatenate([np.mean(splits, axis=1), np.std(splits, axis=1)]))
+            # s = []
+            # for i in range(0, bins):
+            #     s.append( (((i*l) < row) & (row <= (i+1)*l)).sum() )
+            # X_new.append(np.concatenate([np.mean(splits, axis=1), s]))
 
-        return np.array(X_new)
+            X_new.append(np.median(splits, axis=1))
+
+        return X_new
