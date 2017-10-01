@@ -63,8 +63,9 @@ class StatsExtraction(BaseEstimator, TransformerMixin):
 
 # Build n bins with mean from values
 class BinsExtraction(BaseEstimator, TransformerMixin):
-    def __init__(self, bin_length=3):
+    def __init__(self, bin_length=3, del_zero_std=False):
         self.bin_length = bin_length
+        self.del_zero_std = del_zero_std
 
     def fit(self, X, y=None):
         return self
@@ -73,6 +74,9 @@ class BinsExtraction(BaseEstimator, TransformerMixin):
         X_new = []
         num_bins = int(len(X[0]) / self.bin_length) # int() same as floor()
 
+        # Should raise error if file not found
+        if self.del_zero_std:
+            zero_std_ind = np.genfromtxt('../../data/zero_std_ind_'+str(self.bin_length)+'.csv', delimiter=',')
         # bins = 50
         # l = int(1600/bins)
 
@@ -85,6 +89,10 @@ class BinsExtraction(BaseEstimator, TransformerMixin):
             #     s.append( (((i*l) < row) & (row <= (i+1)*l)).sum() )
             # X_new.append(np.concatenate([np.mean(splits, axis=1), s]))
 
-            X_new.append(np.median(splits, axis=1))
+            # delete columns where std is zero
+            if self.del_zero_std:
+                splits = np.delete(splits, zero_std_ind, axis=0)
+
+            X_new.append(np.mean(splits, axis=1))
 
         return X_new

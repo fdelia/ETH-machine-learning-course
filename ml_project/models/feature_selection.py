@@ -41,5 +41,5 @@ class RemoveEmptyValues(BaseEstimator, TransformerMixin):
     def transform(self, X, y=None):
         X_new = []
         for i in range(0, len(X)):
-            X_new.append(X[i][650000 : -750000])
+            X_new.append(X[i][672000 : -786000])
         return X_new

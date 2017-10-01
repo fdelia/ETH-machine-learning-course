@@ -6,7 +6,7 @@ import numpy as np
 
 class GridSearchCV(GridSearchCV):
     """docstring for GridSearchCV"""
-    def __init__(self, est_class, est_params, param_grid, cv=None, n_jobs=1,
+    def __init__(self, est_class, est_params, param_grid, cv=None, n_jobs=-1,
                  error_score="raise", save_path=None):
         self.est_class = est_class
         self.est_params = est_params
@@ -34,7 +34,7 @@ class GridSearchCV(GridSearchCV):
         }
 
         print("mean:", np.mean(data["mean_test_score"]), " std:", np.mean(data["std_test_score"]))
-        
+
         df = pd.DataFrame.from_dict(pd.io.json.json_normalize(data))
         df.to_csv(normpath(self.save_path+"GridSearchCV.csv"))
 
