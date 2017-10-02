@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from matplotlib import pyplot as plt
+import xgboost as xgb
 
 
 class KernelEstimator(skl.base.BaseEstimator, skl.base.TransformerMixin):
@@ -60,3 +61,24 @@ class KernelEstimator(skl.base.BaseEstimator, skl.base.TransformerMixin):
 
     def set_save_path(self, save_path):
         self.save_path = save_path
+
+
+class XGBRegressor(skl.base.BaseEstimator, skl.base.TransformerMixin):
+    """Some notes."""
+    def __init__(self, max_depth=3, learning_rate=0.1, n_estimators=100):
+        self.model = xgb.XGBRegressor(max_depth=max_depth, learning_rate=learning_rate,
+        n_estimators=n_estimators, silent=True, objective='reg:linear')
+        pass
+
+    def fit(self, X, y):
+        self.model.fit(X, y)
+        return self
+
+    def predict(self, X):
+        predictions = self.model.predict(X)
+        return predictions
+
+    def score(self, X, y):
+        scores = (self.model.predict(X) - y)**2 / len(y)
+        score = np.sum(scores)
+        return score

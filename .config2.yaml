@@ -19,28 +19,36 @@ params:
      # kfold 3
      # linReg 4th: mean: 0.857494274434  std: 0.0296490510416
      # every 3rd: mean: 0.858113799339  std: 0.0291792646341
-  #  - module: sklearn.preprocessing
-  #    class: Normalizer
+     # every 2nd, kfold 2?: mean: 0.857891918096  std: 0.0297765934204
+   - module: sklearn.preprocessing
+     class: Normalizer
   #  - module: sklearn.linear_model
   #    class: LinearRegression
   #    params:
   #      n_jobs: -1
-      # kfold 2
+      # kfold 2, with normalizer
       #
-   - module: sklearn.neural_network
-     class: MLPRegressor
+  #  - module: sklearn.neural_network
+  #    class: MLPRegressor
+  #    params:
+  #      hidden_layer_sizes: (100,)
+  #       #  batch_size: 10
+  #      max_iter: 20
+  #      random_state: 37
+  #      alpha: 0.0001
+  #      learning_rate: constant
+   - module: ml_project.models.regression
+     class: XGBRegressor
      params:
-       hidden_layer_sizes: (100,)
-        #  batch_size: 10
-       max_iter: 20
-       random_state: 37
-       alpha: 0.0001
-       learning_rate: constant
-
+       max_depth: 3
+       learning_rate: 0.1
+       n_estimators: 100
 
  param_grid:
-   MLPRegressor__alpha:
-     - 0.0001
+   XGBRegressor__n_estimators:
+     - 100
+  #  MLPRegressor__alpha:
+    #  - 0.0001
   #  LinearRegression__normalize:
   #    - False
  cv:
