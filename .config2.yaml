@@ -1,0 +1,52 @@
+# Using this to try around and get an offline score for my model
+# tries to do : PolynomialFeatures and SelectKBest with linear regression
+
+#smt run --config .config.yaml -X data/X_train.npy -y data/y_1.csv -a fit
+module: ml_project.model_selection
+class: GridSearchCV
+params:
+ est_module: ml_project.pipeline
+ est_class: Pipeline
+ est_params:
+
+  # kfold 3:
+  #  62, delZeros: mean: 0.839027670737  std: 0.0259632079337
+
+   - module: ml_project.models.feature_extraction
+     class: ImageExtraction
+
+     # kfold 2, linReg: mean: 0.844371232742  std: 0.0172156157306
+     # kfold 3
+     # linReg 4th: mean: 0.857494274434  std: 0.0296490510416
+     # every 3rd: mean: 0.858113799339  std: 0.0291792646341
+  #  - module: sklearn.preprocessing
+  #    class: Normalizer
+  #  - module: sklearn.linear_model
+  #    class: LinearRegression
+  #    params:
+  #      n_jobs: -1
+      # kfold 2
+      #
+   - module: sklearn.neural_network
+     class: MLPRegressor
+     params:
+       hidden_layer_sizes: (100,)
+        #  batch_size: 10
+       max_iter: 20
+       random_state: 37
+       alpha: 0.0001
+       learning_rate: constant
+
+
+ param_grid:
+   MLPRegressor__alpha:
+     - 0.0001
+  #  LinearRegression__normalize:
+  #    - False
+ cv:
+   module: sklearn.model_selection
+   class: KFold
+   params:
+     n_splits: 2
+     shuffle: True
+     random_state: 37
