@@ -8,57 +8,97 @@ params:
  est_module: ml_project.pipeline
  est_class: Pipeline
  est_params:
-   - module: ml_project.models.feature_selection
-     class: RemoveEmptyValues
+  # 7   mean: 0.317375552979  std: 0.0334344241206
+  #  - module: ml_project.models.preprocessing
+  #    class: Flatten
+  #    params:
+  #      dim: 2
+  #  - module: sklearn.random_projection
+  #    class: GaussianRandomProjection
 
-   # full, randomSelection 1000, mean: 0.706398726566  std: 0.00709549359157
+  # full, randomSelection 1000, mean: 0.706398726566  std: 0.00709549359157
   #  - module: ml_project.models.feature_selection
   #    class: RandomSelection
   #    params:
   #      random_state: 37
   #      n_components: 1000
 
-   # full, mean: 0.863778528597, std: 0.00486466587765
+  # full, mean: 0.863778528597, std: 0.00486466587765
   #  - module: ml_project.models.feature_extraction
   #    class: StatsExtraction
   #    params:
   #      bins: 10
 
+  #  - module: ml_project.models.feature_selection
+  #    class: RemoveEmptyValues
+  #  55, mean: 0.846027470504  std: 0.016556594152
   #  60, mean: 0.845356423781  std: 0.0166878729634
-  #  70, removeEmptyValues, mean: 0.713048352206  std: 0.0617523270325
-  # 150, removeEmptyValues, mean: 0.72933134527  std: 0.0892725570146
+  #  70, mean: 0.847869047458  std: 0.0146094943098
+  # 150, mean: 0.72933134527  std: 0.0892725570146 ? probably not all data
+
+  # kfold 3:
+  #  20, delZeros: mean: 0.856737791702  std: 0.0286527402019
+  #  30, delZeros: mean: 0.852930462868  std: 0.0285971083359
+  #  60, delZeros: mean: 0.842957055226  std: 0.0263348549017
+  #  62, delZeros: mean: 0.839027670737  std: 0.0259632079337 score 78
+  #  62, mean: 0.838695320595  std: 0.0239675192377
+  #  63, delZeros: mean: 0.839761129887  std: 0.0257238862591
+  #  60, +feature: mean: 0.842957055226  std: 0.0263348549017
+  #  30, mean only: mean: 0.859351007955  std: 0.0272902772175
+  #  60, mean only: mean: 0.850134330402  std: 0.0262591635725
+  #  60, normaliz: mean: 0.842965399368  std: 0.0263269986484
+  # 60, norm, median: mean: 0.875549094516  std: 0.0241961177634
+  #  60, mean/amax: mean: 0.871223885923  std: 0.0259421789959
+  #  60, mean/std: mean: 0.866899561079  std: 0.0256796911883
+  # 120, mean/std: mean: 0.851367162172  std: 0.0200311522277
+  # 60 with hist bins: mean: 0.85193922784  std: 0.0261626240987
+
+
+  #  62, more_features: mean: 0.849707728594  std: 0.0245772155342
+  #  62: mean: 0.84319099585  std: 0.0251235415445
+  #  62, middle: mean: 0.839071004436  std: 0.0340406941865 score 74.14
+  #  50, middle: mean: 0.83728244731  std: 0.0349213309324
+  # 62, middle, more: mean: 0.843994563837  std: 0.0340749919582
+  # optimiere bin_length nochmals
+  # optimiere welche bilder weggenommen werden am Anfang und Ende
    - module: ml_project.models.feature_extraction
      class: BinsExtraction
      params:
-       bin_length: 60 # (opt in 60-80 somewhere)
-
-  #  - module: sklearn.decomposition
-  #    class: TruncatedSVD
-  #    params:
-        #  n_components: 1000
-  #      random_state: 37
-
+       bin_length: 62 # (opt is 60 with linear reg)
+       del_zero_std: False
+       middle_images_only: True
+       more_features: False
 
    - module: sklearn.preprocessing
-     class: PolynomialFeatures
-     params:
-       degree: 2
-   - module: sklearn.feature_selection
-     class: SelectKBest
-     params:
-       score_func: f_regression
-       k: 1000
+     class: Normalizer
 
-
-   - module: sklearn.preprocessing
-     class: StandardScaler
    - module: sklearn.linear_model
      class: LinearRegression
      params:
        n_jobs: -1
 
-  # 0.1, 0.3, 10 with bin_l 70,  mean: -0.0132783651372  std: 0.00202748616224 not enough data used, probably overfitting
-  # full  10, binl 60, mean: -0.00391929169025  std: 9.20374968322e-05 overfitting
+  # mean: 0.853931384961  std: 0.0259668934841
+  #  - module: sklearn.linear_model
+  #    class: Lasso
+  #    params:
+  #      alpha: 0.1
+  #      normalize: True
+  #      warm_start: True
+  #      random_state: 37
+
+
+  #  - module: sklearn.preprocessing
+  #    class: StandardScaler
+  #  - module: sklearn.neural_network
+  #    class: MLPRegressor
+  #    params:
+  #      hidden_layer_sizes: (100,)
+  #       #  batch_size: 10
+  #      max_iter: 20
+  #      random_state: 37
+  #      alpha: 0.0001
+  #      learning_rate: constant
+
   # full 0.1, 100, binl 60, mean: 0.671475231808  std: 0.00069032392510
   # full 0.01, 200, binl 60, mean: 0.778631767563  std: 0.00260524577358
   #  - module: sklearn.ensemble
@@ -69,20 +109,14 @@ params:
   #     warm_start: True
 
  param_grid:
-  #  GradientBoostingRegressor__n_estimators:
-  #    - 200
-  #  GradientBoostingRegressor__learning_rate:
-  #    - 0.1
-  #    - 0.01
-  #  GradientBoostingRegressor__max_depth:
-  #    - 0.3
+  #  GaussianRandomProjection__n_components:
+  #    - 6
+  #    - 8
    BinsExtraction__bin_length:
-     - 60
-  #    - 70
-  #    - 80
-  #  StatsExtraction__bins:
-  #    - 10
-  #    - 30
+     - 45
+  #  BinsExtraction__del_zero_std:
+  #    - False
+    #  - False
   #  PCA__n_components:
     #  - 100
   #  RandomSelection__n_components:
@@ -91,6 +125,6 @@ params:
    module: sklearn.model_selection
    class: KFold
    params:
-     n_splits: 2
+     n_splits: 3
      shuffle: True
      random_state: 37
