@@ -52,21 +52,31 @@ params:
   #  60, mean/std: mean: 0.866899561079  std: 0.0256796911883
   # 120, mean/std: mean: 0.851367162172  std: 0.0200311522277
   # 60 with hist bins: mean: 0.85193922784  std: 0.0261626240987
-
-
-  #  62, more_features: mean: 0.849707728594  std: 0.0245772155342
-  #  62: mean: 0.84319099585  std: 0.0251235415445
-  #  62, middle: mean: 0.839071004436  std: 0.0340406941865 score 74.14
-  #  50, middle: mean: 0.83728244731  std: 0.0349213309324
+  # 62, more_features: mean: 0.849707728594  std: 0.0245772155342
+  # 62: mean: 0.84319099585  std: 0.0251235415445
+  # 50, 38-130: mean: 0.843574746203  std: 0.032148642953
+  # 50, 50-135: mean: 0.842498541637  std: 0.0335571743274
+  # 45, middle: mean: 0.843080798586  std: 0.0361421842654
   # 62, middle, more: mean: 0.843994563837  std: 0.0340749919582
-  # optimiere bin_length nochmals
+
+
+
+  # 62, middle: mean: 0.839071004436  std: 0.0340406941865 score 74.14
+  # 50, middle: mean: 0.83728244731  std: 0.0349213309324 score 73.3
+  # kfold 4, mse
+  # ", mse, kfold4: mean: 0.833630633033  std: 0.0292873134015
+  # gaussianProcess: mean: 0.835240895523  std: 0.0295815149963
+  # 35, linreg: mean: 0.826372102319  std: 0.0285803311244
+
   # optimiere welche bilder weggenommen werden am Anfang und Ende
+  # optimiere bin_length nochmals
    - module: ml_project.models.feature_extraction
      class: BinsExtraction
      params:
-       bin_length: 62 # (opt is 60 with linear reg)
+       bin_length: 35
        del_zero_std: False
-       middle_images_only: True
+       images_x_from: 50
+       images_x_to: 130
        more_features: False
 
    - module: sklearn.preprocessing
@@ -77,14 +87,20 @@ params:
      params:
        n_jobs: -1
 
-  # mean: 0.853931384961  std: 0.0259668934841
-  #  - module: sklearn.linear_model
-  #    class: Lasso
+  #  - module: sklearn.gaussian_process
+  #    class: GaussianProcessRegressor
   #    params:
-  #      alpha: 0.1
-  #      normalize: True
+  #      kernel:
+  #        module: sklearn.gaussian_process.kernels
+  #        class: RBF
+
+
+  # 50, mse, kfold 4:
+  #  - module: sklearn.linear_model
+  #    class: ElasticNet
+  #    params:
   #      warm_start: True
-  #      random_state: 37
+  #      alpha: 0.1
 
 
   #  - module: sklearn.preprocessing
@@ -101,30 +117,31 @@ params:
 
   # full 0.1, 100, binl 60, mean: 0.671475231808  std: 0.00069032392510
   # full 0.01, 200, binl 60, mean: 0.778631767563  std: 0.00260524577358
+  # 0.01, 1000, binl 50, mean: 0.826848028644  std: 0.030524973401 score 104.47566
   #  - module: sklearn.ensemble
   #    class: GradientBoostingRegressor
   #    params:
   #     learning_rate: 0.01
-  #     n_estimators: 200
+  #     n_estimators: 1000
   #     warm_start: True
 
  param_grid:
-  #  GaussianRandomProjection__n_components:
-  #    - 6
-  #    - 8
    BinsExtraction__bin_length:
-     - 45
-  #  BinsExtraction__del_zero_std:
-  #    - False
-    #  - False
-  #  PCA__n_components:
-    #  - 100
-  #  RandomSelection__n_components:
-  #   - 1000
+     - 30
+    #  - 40
+    #  - 50
+  #  BinsExtraction__images_x_from:
+    #  - 46
+    #  - 42
+    #  - 45
+    #  - 40
+  #  BinsExtraction__images_x_to:
+    #  - 125
+    #  - 120
  cv:
    module: sklearn.model_selection
    class: KFold
    params:
-     n_splits: 3
+     n_splits: 4
      shuffle: True
      random_state: 37

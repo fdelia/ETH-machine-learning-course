@@ -4,13 +4,15 @@ params:
   class_list:
     # - module: ml_project.models.feature_selection
     #   class: RemoveEmptyValues
-    
+
 
     - module: ml_project.models.feature_extraction
       class: BinsExtraction
       params:
-        bin_length: 50 # (opt is 60)
-        middle_images_only: True # score:
+        bin_length: 50
+        # middle_images_only: True # score: 73.3
+        images_x_from: 50
+        images_x_to: 130
         more_features: False # score:
         del_zero_std: False
 
@@ -21,6 +23,13 @@ params:
       class: LinearRegression
       params:
         n_jobs: -1
+    # - module: sklearn.ensemble
+    #   class: GradientBoostingRegressor
+    #   params:
+    #     learning_rate: 0.01
+    #     n_estimators: 1000
+    #     warm_start: True
+
 
 
     # - module: sklearn.linear_model
