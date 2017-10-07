@@ -61,11 +61,19 @@ class StatsExtraction(BaseEstimator, TransformerMixin):
 
         return np.array(X_new)
 
-# Build n bins with mean from values
 class BinsExtraction(BaseEstimator, TransformerMixin):
-    def __init__(self, bin_length=3, del_zero_std=False):
+    """Build n bins with mean from values"""
+    def __init__(self, bin_length=3, del_zero_std=False,
+        images_x_from=False, images_x_to=False, more_features=False,
+        images_y_from=False, images_y_to=False):
         self.bin_length = bin_length
         self.del_zero_std = del_zero_std
+        self.more_features = more_features
+
+        self.images_x_from = images_x_from
+        self.images_x_to = images_x_to
+        self.images_y_from = images_y_from
+        self.images_y_to = images_y_to
 
     def fit(self, X, y=None):
         return self
@@ -76,23 +84,73 @@ class BinsExtraction(BaseEstimator, TransformerMixin):
 
         # Should raise error if file not found
         if self.del_zero_std:
-            zero_std_ind = np.genfromtxt('../../data/zero_std_ind_'+str(self.bin_length)+'.csv', delimiter=',')
-        # bins = 50
-        # l = int(1600/bins)
+            zero_std_ind = np.genfromtxt('/Users/fabiodelia/Dropbox/dev/ml-project/data/zero_std_ind_'+str(self.bin_length)+'.csv', delimiter=',')
 
         for row in X:
-            row = row[0 : num_bins*self.bin_length] # crop last elements, they are probably 0 anyway
-            splits = np.split(row, num_bins)
-            # X_new.append(np.concatenate([np.mean(splits, axis=1), np.std(splits, axis=1)]))
-            # s = []
-            # for i in range(0, bins):
-            #     s.append( (((i*l) < row) & (row <= (i+1)*l)).sum() )
-            # X_new.append(np.concatenate([np.mean(splits, axis=1), s]))
+            # use only without "RemoveEmptyValues"
+            # This is feature selection actually
+            if self.images_x_from is not False and self.images_x_to is not False:
+                #images = np.split(row, 176)[50:130] # pretty optimal already
+                images = np.split(row, 176)[self.images_x_from : self.images_x_to]
 
+                # x need to be set for this, but don't mind at the moment
+                if self.images_y_from is not False and self.images_y_to is not False:
+                    images_new = []
+                    for image in images:
+                        images_new.append(np.split(image, 208)[self.images_y_from : self.images_y_to])
+                    images = np.array(images_new)
+
+                row = np.array(images).flatten()
+                num_bins = int(len(row) / self.bin_length)
+
+            row2 = row[0 : num_bins*self.bin_length] # crop last elements, they are probably 0 anyway
+            splits = np.split(row2, num_bins)
             # delete columns where std is zero
             if self.del_zero_std:
                 splits = np.delete(splits, zero_std_ind, axis=0)
 
-            X_new.append(np.mean(splits, axis=1))
+            features = np.mean(splits, axis=1)
+
+            if self.more_features:
+                splits = np.split(row2, self.bin_length)
+                features2 = np.mean(splits, axis=0)
+                X_new.append(np.concatenate((features, features2)))
+            else:
+                X_new.append(features)
 
         return X_new
+
+
+class ImageExtraction(BaseEstimator, TransformerMixin):
+    """Make use of spatial properties.
+        First 14 and last 17 images are empty in all rows. Drop them.
+    """
+    def __init__(self):
+        pass
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X, y=None):
+        X_new = []
+        SPLIT_BY = 2
+
+        for row in X:
+            images = np.split(row, 176)
+            images_new = []
+
+            # only get every nth element, not optimal, loosing information here
+            for image in images[14:-17:4]:
+                splits = np.split(image, 208 / SPLIT_BY * 176)
+                image = np.mean(splits, axis=1)
+
+                image = np.array(np.split(image, 208)).T
+                splits = np.split(image.flatten(), 208 / SPLIT_BY * 176 / SPLIT_BY)
+                image = np.mean(splits, axis=1)
+
+                images_new.append(image)
+
+            X_new.append(list(np.array(images_new).flatten()))
+
+        return X_new
+    #256 / 176

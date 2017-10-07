@@ -65,8 +65,21 @@ params:
   # 50, middle: mean: 0.83728244731  std: 0.0349213309324 score 73.3
   # kfold 4, mse
   # ", mse, kfold4: mean: 0.833630633033  std: 0.0292873134015
-  # gaussianProcess: mean: 0.835240895523  std: 0.0295815149963
+  # 40, linreg: mean: 0.83708416878  std: 0.0293496345153
   # 35, linreg: mean: 0.826372102319  std: 0.0285803311244
+  # 30, linreg: mean: 0.840424834789  std: 0.0298434115336
+  # 35, to 125: mean: 0.823132286683  std: 0.0302782578896
+  # 35, to 120: mean: 0.821102433324  std: 0.0283531050997
+
+  # ", y10-160: mean: 0.819917000775  std: 0.0317794764631
+  # ", y20-160: mean: 0.81863347848  std: 0.0336067711133
+  # ", y30-160: 
+
+  # 35, to 135: mean: 0.831204378596  std: 0.0295712132338
+  # 35, from 45: mean: 0.841098066165  std: 0.0299608014201
+  # 35, from 55: mean: 0.831746859895  std: 0.031972550086
+  # gaussian: mean: 0.835240895523  std: 0.0295815149963
+  # gaussian opt10: mean: 0.842324995359  std: 0.0301100922683
 
   # optimiere welche bilder weggenommen werden am Anfang und Ende
   # optimiere bin_length nochmals
@@ -74,9 +87,11 @@ params:
      class: BinsExtraction
      params:
        bin_length: 35
-       del_zero_std: False
        images_x_from: 50
        images_x_to: 130
+       images_y_from: 30
+       images_y_to: 160
+       del_zero_std: False
        more_features: False
 
    - module: sklearn.preprocessing
@@ -90,9 +105,8 @@ params:
   #  - module: sklearn.gaussian_process
   #    class: GaussianProcessRegressor
   #    params:
-  #      kernel:
-  #        module: sklearn.gaussian_process.kernels
-  #        class: RBF
+  #      n_restarts_optimizer: 10
+
 
 
   # 50, mse, kfold 4:
@@ -126,17 +140,17 @@ params:
   #     warm_start: True
 
  param_grid:
-   BinsExtraction__bin_length:
-     - 30
+  #  BinsExtraction__bin_length:
+    #  - 35
     #  - 40
     #  - 50
   #  BinsExtraction__images_x_from:
-    #  - 46
+  #    - 55
     #  - 42
     #  - 45
     #  - 40
-  #  BinsExtraction__images_x_to:
-    #  - 125
+   BinsExtraction__images_x_to:
+     - 120
     #  - 120
  cv:
    module: sklearn.model_selection
