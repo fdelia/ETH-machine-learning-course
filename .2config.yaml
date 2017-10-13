@@ -25,7 +25,7 @@ params:
 
   # full, mean: 0.863778528597, std: 0.00486466587765
   #  - module: ml_project.models.feature_extraction
-  #    class: StatsExtraction
+  #    class: HistExtraction
   #    params:
   #      bins: 10
 
@@ -94,64 +94,49 @@ params:
 
   # optimiere welche bilder weggenommen werden am Anfang und Ende
   # optimiere bin_length nochmals
-   - module: ml_project.models.feature_extraction
-     class: BinsExtraction
-     params:
-       bin_length: 35
-       images_x_from: 50
-       images_x_to: 120
-       images_y_from: 20
-       images_y_to: 160
-       del_zero_std: False
-       more_features: False
+  #  - module: ml_project.models.feature_extraction
+  #    class: BinsExtraction
+  #    params:
+  #      bin_length: 35
+  #      images_x_from: 50
+  #      images_x_to: 120
+  #      images_y_from: 20
+  #      images_y_to: 160
+  #      del_zero_std: False
+  #      more_features: False
 
 
   #  - module: ml_project.models.feature_extraction
   #    class: StatsExtraction
 
+   - module: ml_project.models.feature_extraction
+     class: ClusteredHistExtraction
+     params:
+       n_clusters: 10
+       n_samples: 2
 
    - module: sklearn.preprocessing
     #  class: Normalizer
      class: StandardScaler
-
-  #  - module: sklearn.linear_model
-  #    class: LinearRegression
-  #    params:
-  #      n_jobs: -1
-
-
-  # with statsextraction
-  # step
-  # 1 mean: 0.844990206658  std: 0.0402240832089
-  # 2 mean: 0.030015426154  std: 0.00181558835225
-  # binext: mean: 0.81960217199  std: 0.0457805041688
-   - module: sklearn.kernel_ridge
-     class: KernelRidge
+   - module: sklearn.feature_selection
+     class: VarianceThreshold
+    #  params:
+    #    threshold: 0.1
+   - module: sklearn.linear_model
+     class: LinearRegression
      params:
-       kernel: 'polynomial'
+       n_jobs: -1
+
+  # binext: mean: 0.81960217199  std: 0.0457805041688
+  #  - module: sklearn.kernel_ridge
+  #    class: KernelRidge
+  #    params:
+  #      kernel: 'polynomial'
 
 
-  #  - module: sklearn.gaussian_process
-  #    class: GaussianProcessRegressor
-  #    params:
-  #      n_restarts_optimizer: 10
-  # 50, mse, kfold 4:
-  #  - module: sklearn.linear_model
-  #    class: ElasticNet
-  #    params:
-  #      warm_start: True
-  #      alpha: 0.1
-  #  - module: sklearn.preprocessing
-  #    class: StandardScaler
-  #  - module: sklearn.neural_network
-  #    class: MLPRegressor
-  #    params:
-  #      hidden_layer_sizes: (100,)
-  #       #  batch_size: 10
-  #      max_iter: 20
-  #      random_state: 37
-  #      alpha: 0.0001
-  #      learning_rate: constant
+
+
+
 
   # full 0.1, 100, binl 60, mean: 0.671475231808  std: 0.00069032392510
   # full 0.01, 200, binl 60, mean: 0.778631767563  std: 0.00260524577358
@@ -164,25 +149,12 @@ params:
   #     warm_start: True
 
  param_grid:
-  #  StatsExtraction__bins:
-  #    - 10
-   BinsExtraction__bin_length:
+   ClusteredHistExtraction__n_clusters:
+     - 10
+  #  HistExtraction__bins:
+    #  - 10
+  #  BinsExtraction__bin_length:
     #  - 25
-    #  - 30
-     - 35
-    #  - 40
-    #  - 35
-    #  - 40
-    #  - 50
-  #  BinsExtraction__images_x_from:
-  #    - 55
-    #  - 42
-    #  - 45
-    #  - 40
-  #  BinsExtraction__images_y_to:
-  #    - 140
-  #    - 150
-  #    - 160
  cv:
    module: sklearn.model_selection
    class: KFold

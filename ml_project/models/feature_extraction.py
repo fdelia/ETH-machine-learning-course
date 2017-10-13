@@ -30,9 +30,52 @@ class RandomSelection(BaseEstimator, TransformerMixin):
 
         return X_new
 
+
+from sklearn.cluster import KMeans
+import random
+random.seed(42)
+class ClusteredHistExtraction(BaseEstimator, TransformerMixin):
+    def __init__(self, n_clusters=10, n_samples=2):
+        self.n_clusters = n_clusters
+        self.n_samples = n_samples
+
+    def fit(self, X, y=None):
+        samples = random.sample(list(X), self.n_samples)
+
+        # trim zeros, not sure if it helps
+        for i, sample in enumerate(samples):
+            samples[i] = sample[1672390 : -786303]
+
+        # compute cluster centers
+        self.kmeans = KMeans(n_clusters=self.n_clusters, n_jobs=-1, random_state=42)
+        self.kmeans.fit(np.array(samples).T)
+        values = self.kmeans.cluster_centers_.T
+
+        # mean of the clusters over the rows
+        for i, v in enumerate(values.T):
+            values.T[i] = np.sort(v)
+
+        values_mean = np.mean(values.T, axis=0)
+        self.edges = [1]
+        for center_1, center_2 in zip(values_mean[:-1], values_mean[1:]):
+            self.edges.append(.5 * (center_1 + center_2))
+
+        return self
+
+    def transform(self, X, y=None):
+        # np.histogram to make bins from edges, counts the number of pixels
+        X_new = []
+        for x in X:
+            hist = np.histogram(x, bins=self.edges)
+            X_new.append(hist[0])
+
+        return X_new
+
+
+
 # Build n bins from hist/distribution of values
 # Number of values between x, x+1
-class StatsExtraction(BaseEstimator, TransformerMixin):
+class HistExtraction(BaseEstimator, TransformerMixin):
     def __init__(self, bins=10):
         self.bins = bins
 
@@ -43,19 +86,40 @@ class StatsExtraction(BaseEstimator, TransformerMixin):
         # make stats here
         bins = self.bins
         X_new = []
-        l = int(1600/bins)
+        # wichtige teile: 400-600, 600-900, 900-1200, 1300-1500
+        steps = [100, 200, 400, 600, 900, 1200, 1300, 1500, 1700]
 
         for x in X:
-            row_new = [
-                # np.mean(x),
-                # np.std(x),
-                # np.var(x),
-                # np.max(x),
-                # np.count_nonzero(x),
-            ]
+            row_new = []
+            # for split in np.split(x, 1):
 
-            for i in range(0, bins):
-                row_new.append( (((i*l) < x) & (x <= (i+1)*l)).sum() )
+            step = 5
+            low = 200
+            for high in range(low+step, 400, step):
+                row_new.append(((x >= low) & (x <= high)).sum())
+                low = high
+
+            low = 400
+            for high in range(low+step, 600, step):
+                row_new.append(((x >= low) & (x <= high)).sum())
+                low = high
+
+            low = 900
+            for high in range(low+step, 1200, step):
+                row_new.append(((x >= low) & (x <= high)).sum())
+                low = high
+
+            low = 1300
+            for high in range(low+step, 1500, step):
+                row_new.append(((x >= low) & (x <= high)).sum())
+                low = high
+
+
+
+            # mean: 0.861744557643  std: 0.00949954149053
+            # for i, low in enumerate(steps[:-1]):
+            #     high = steps[i+1]
+            #     row_new.append(((x >= low) & (x <= high)).sum())
 
             X_new.append(row_new)
 
