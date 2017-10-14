@@ -41,23 +41,32 @@ class ClusteredHistExtraction(BaseEstimator, TransformerMixin):
 
     def fit(self, X, y=None):
         samples = random.sample(list(X), self.n_samples)
+        self.kmeans = KMeans(n_clusters=self.n_clusters, n_jobs=-1, random_state=42)
 
         # trim zeros, not sure if it helps
+        centers = []
         for i, sample in enumerate(samples):
-            samples[i] = sample[1672390 : -786303]
+            # samples[i] = sample[1672390 : -786303]
+            samples[i] = sample[(sample > 0)]
+            self.kmeans.fit(np.array(samples[i]).T)
+            centers.append(self.kmeans.cluster_centers_)
+            print(str(i) + ' done')
+
+        values = np.array(centers).flatten()
+        print('n centers: ' + str(len(values)))
 
         # compute cluster centers
-        self.kmeans = KMeans(n_clusters=self.n_clusters, n_jobs=-1, random_state=42)
-        self.kmeans.fit(np.array(samples).T)
-        values = self.kmeans.cluster_centers_.T
+        # self.kmeans.fit(np.array(samples).T)
+        # values = self.kmeans.cluster_centers_.T
 
-        # mean of the clusters over the rows
-        for i, v in enumerate(values.T):
-            values.T[i] = np.sort(v)
+        # mean of the clusters over the rows, does this makes sense?
+        # for i, v in enumerate(values.T):
+        #     values.T[i] = np.sort(v)
 
-        values_mean = np.mean(values.T, axis=0)
+        # values = np.mean(values.T, axis=0)
+        values = np.sort(values)
         self.edges = [1]
-        for center_1, center_2 in zip(values_mean[:-1], values_mean[1:]):
+        for center_1, center_2 in zip(values[:-1], values[1:]):
             self.edges.append(.5 * (center_1 + center_2))
 
         return self
