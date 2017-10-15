@@ -59,8 +59,6 @@ params:
   # 45, middle: mean: 0.843080798586  std: 0.0361421842654
   # 62, middle, more: mean: 0.843994563837  std: 0.0340749919582
 
-
-
   # 62, middle: mean: 0.839071004436  std: 0.0340406941865 score 74.14
   # 50, middle: mean: 0.83728244731  std: 0.0349213309324 score 73.3
   # kfold 4, mse
@@ -105,15 +103,18 @@ params:
   #      del_zero_std: False
   #      more_features: False
 
-
   #  - module: ml_project.models.feature_extraction
   #    class: StatsExtraction
+
+
 
    - module: ml_project.models.feature_extraction
      class: ClusteredHistExtraction
      params:
        n_clusters: 10
-       n_samples: 2
+       n_samples: 3
+       images_x_from: 50
+       images_x_to: 130
 
    - module: sklearn.preprocessing
     #  class: Normalizer
@@ -122,18 +123,47 @@ params:
      class: VarianceThreshold
     #  params:
     #    threshold: 0.1
-   - module: sklearn.linear_model
-     class: LinearRegression
-     params:
-       n_jobs: -1
 
-  # binext: mean: 0.81960217199  std: 0.0457805041688
-  #  - module: sklearn.kernel_ridge
-  #    class: KernelRidge
+    # 10 2 mean: -0.0024788475812  std: 0.00355764497358
+    # 10 3 mean: 0.881540831507  std: 0.0164859670043
+    # 10 5 mean: 0.880186211752  std: 0.0187992062709
+
+  #  - module: sklearn.linear_model
+  #    class: LinearRegression
   #    params:
-  #      kernel: 'polynomial'
+  #      n_jobs: -1
 
+    # binext: mean: 0.81960217199  std: 0.0457805041688
+    # clusters samples
+    # adding centers
+    # 3 3  mean: 0.893364733394  std: 0.0251460130129
+    # 10 3 mean: 0.881540831507  std: 0.0164859670043
+    # 10 5 mean: 0.876532056005  std: 0.0176116013681
+    # 5 20 mean: 0.885697215588  std: 0.0320907013732
+    # means of centers
+    # 20 3 mean: 0.887983940253  std: 0.0205856500626
+   - module: sklearn.kernel_ridge
+     class: KernelRidge
+     params:
+       kernel: 'polynomial'
 
+  # adding centers
+  # 10 3 mean: 0.873334907888  std: 0.0230843653765
+  #  - module: sklearn.ensemble
+  #    class: BaggingRegressor
+  #    params:
+  #      max_samples: 0.2
+  #      n_estimators: 10
+  #      base_estimator: sklearn.svm.LinearSVR
+
+    # adding centers
+    # 10 3 mean: 0.089928057554  std: 0.0133574639898   ???
+    #  8 3 mean: 0.0908273381295  std: 0.0217216529784
+  #  - module: sklearn.svm
+  #    class: LinearSVC
+  #    params:
+  #      C: 1.0
+  #      max_iter: 200 # 1000
 
 
 
@@ -149,8 +179,19 @@ params:
   #     warm_start: True
 
  param_grid:
+  #  KernelRidge__kernel:
+  #    - 'polynomial'
+  #  LinearSVR__C:
+  #    - 0.5
+  #    - 1.0
+  #    - 1.5
    ClusteredHistExtraction__n_clusters:
+     - 8
      - 10
+   ClusteredHistExtraction__n_samples:
+     - 3
+     - 4
+    #  - 80
   #  HistExtraction__bins:
     #  - 10
   #  BinsExtraction__bin_length:

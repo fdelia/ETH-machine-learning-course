@@ -31,50 +31,59 @@ class RandomSelection(BaseEstimator, TransformerMixin):
         return X_new
 
 
-from sklearn.cluster import KMeans
+from sklearn.cluster import KMeans, MiniBatchKMeans
 import random
 random.seed(42)
 class ClusteredHistExtraction(BaseEstimator, TransformerMixin):
-    def __init__(self, n_clusters=10, n_samples=2):
+    def __init__(self, n_clusters=10, n_samples=2, images_x_from=False, images_x_to=False):
         self.n_clusters = n_clusters
         self.n_samples = n_samples
+        self.images_x_from = images_x_from
+        self.images_x_to = images_x_to
+
+
+    def cutImage(x):
+        if self.images_x_from is not False and self.images_x_to is not False:
+            #images = np.split(row, 176)[50:130] # pretty optimal already
+            side_images = np.split(x, 176)[self.images_x_from : self.images_x_to]
+            x = np.array(side_images).flatten()
+        return x
+
 
     def fit(self, X, y=None):
         samples = random.sample(list(X), self.n_samples)
         self.kmeans = KMeans(n_clusters=self.n_clusters, n_jobs=-1, random_state=42)
+        # self.kmeans = MiniBatchKMeans(n_clusters=self.n_clusters, batch_size=100, random_state=42)
 
-        # trim zeros, not sure if it helps
         centers = []
         for i, sample in enumerate(samples):
             # samples[i] = sample[1672390 : -786303]
-            samples[i] = sample[(sample > 0)]
-            self.kmeans.fit(np.array(samples[i]).T)
-            centers.append(self.kmeans.cluster_centers_)
+
+            sample = self.cutImage(sample)
+
+            samples[i] = sample[(sample > 0) & (sample < 1800)]
+            self.kmeans.fit(np.array([samples[i]]).T)
+            centers.append(np.sort(np.array(self.kmeans.cluster_centers_).flatten()))
             print(str(i) + ' done')
 
-        values = np.array(centers).flatten()
-        print('n centers: ' + str(len(values)))
+        if True: # use all centers
+            values = np.array(centers).flatten()
+            values = np.sort(values)
+        else: # take means of centers
+            values = np.mean(centers, axis=0)
 
-        # compute cluster centers
-        # self.kmeans.fit(np.array(samples).T)
-        # values = self.kmeans.cluster_centers_.T
-
-        # mean of the clusters over the rows, does this makes sense?
-        # for i, v in enumerate(values.T):
-        #     values.T[i] = np.sort(v)
-
-        # values = np.mean(values.T, axis=0)
-        values = np.sort(values)
-        self.edges = [1]
+        self.edges = [1] # leave out 0
         for center_1, center_2 in zip(values[:-1], values[1:]):
             self.edges.append(.5 * (center_1 + center_2))
 
+        print('n edges: ' + str(len(self.edges)))
         return self
 
     def transform(self, X, y=None):
         # np.histogram to make bins from edges, counts the number of pixels
         X_new = []
         for x in X:
+            x = self.cutImage(x)
             hist = np.histogram(x, bins=self.edges)
             X_new.append(hist[0])
 
@@ -166,7 +175,7 @@ class BinsExtraction(BaseEstimator, TransformerMixin):
                 #images = np.split(row, 176)[50:130] # pretty optimal already
                 images = np.split(row, 176)[self.images_x_from : self.images_x_to]
 
-                # x need to be set for this, but don't mind at the moment
+                # x needs to be set for this, but don't mind at the moment
                 if self.images_y_from is not False and self.images_y_to is not False:
                     images_new = []
                     for image in images:
