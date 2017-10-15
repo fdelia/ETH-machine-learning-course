@@ -42,7 +42,7 @@ class ClusteredHistExtraction(BaseEstimator, TransformerMixin):
         self.images_x_to = images_x_to
 
 
-    def cutImage(x):
+    def cutImage(self, x):
         if self.images_x_from is not False and self.images_x_to is not False:
             #images = np.split(row, 176)[50:130] # pretty optimal already
             side_images = np.split(x, 176)[self.images_x_from : self.images_x_to]
@@ -58,19 +58,32 @@ class ClusteredHistExtraction(BaseEstimator, TransformerMixin):
         centers = []
         for i, sample in enumerate(samples):
             # samples[i] = sample[1672390 : -786303]
-
             sample = self.cutImage(sample)
 
             samples[i] = sample[(sample > 0) & (sample < 1800)]
-            self.kmeans.fit(np.array([samples[i]]).T)
-            centers.append(np.sort(np.array(self.kmeans.cluster_centers_).flatten()))
-            print(str(i) + ' done')
+            # self.kmeans.fit(np.array([samples[i]]).T)
+            # centers.append(np.sort(np.array(self.kmeans.cluster_centers_).flatten()))
+            # print(str(i) + ' done')
 
-        if True: # use all centers
-            values = np.array(centers).flatten()
-            values = np.sort(values)
-        else: # take means of centers
-            values = np.mean(centers, axis=0)
+        # if True: # use all centers
+        #     values = np.array(centers).flatten()
+        #     values = np.sort(values)
+        # else: # take means of centers
+        #     values = np.mean(centers, axis=0)
+
+
+        # compute cluster centers
+        self.kmeans.fit(np.array(samples).T)
+        values = self.kmeans.cluster_centers_.T
+        print('fitted')
+
+        # mean of the clusters over the rows
+        for i, v in enumerate(values.T):
+            values.T[i] = np.sort(v)
+
+        values = np.mean(values.T, axis=0)
+
+
 
         self.edges = [1] # leave out 0
         for center_1, center_2 in zip(values[:-1], values[1:]):
@@ -90,6 +103,58 @@ class ClusteredHistExtraction(BaseEstimator, TransformerMixin):
         return X_new
 
 
+class GivenEdgesExtraction(BaseEstimator, TransformerMixin):
+    def __init__(self):
+        self.edges = [1,
+ 180,
+ 200,
+ 220,
+ 240,
+ 260.59153353677925,
+ 281.00824805433393,
+ 296.51672876785585,
+ 312.41929109857142,
+ 385.23831822211014,
+ 458.12983660320458,
+ 510.43647791541645,
+ 576.57399025095651,
+ 642.540938664245,
+ 655.08349269468147,
+ 666.54241844275282,
+ 680,
+ 690,
+ 720.33201508885827,
+ 740,
+ 770.89739389945362,
+ 785.82438478516588,
+ 807.58109023044335,
+ 869.72060524581752,
+ 913.23145834367801,
+ 919.63925603546056,
+ 950.7720301599602,
+ 1021.6951866283912,
+ 1069.5507893466106,
+ 1178.3353557602009,
+ 1228.4902326692686,
+ 1277.8951157600625,
+ 1339.3753602258789,
+ 1372.8570616285097,
+ 1400,
+ 1433.3192436369491,
+ 1455,
+ 1480,
+ 1515,
+ 1550,
+ 1600,
+ 1800]
+        pass
+    def fit(self, X, y=None):
+        return self
+    def transform(self, X, y=None):
+        X_new = []
+        for x in X:
+            x_new.append(np.histogram(x, bins=self.edges)[0])
+        return X_new
 
 # Build n bins from hist/distribution of values
 # Number of values between x, x+1
@@ -131,8 +196,6 @@ class HistExtraction(BaseEstimator, TransformerMixin):
             for high in range(low+step, 1500, step):
                 row_new.append(((x >= low) & (x <= high)).sum())
                 low = high
-
-
 
             # mean: 0.861744557643  std: 0.00949954149053
             # for i, low in enumerate(steps[:-1]):
