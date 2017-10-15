@@ -106,7 +106,7 @@ class ClusteredHistExtraction(BaseEstimator, TransformerMixin):
 class GivenEdgesExtraction(BaseEstimator, TransformerMixin):
     def __init__(self):
         self.edges = [1,
- 180,
+ 175,
  190.0,
  200,
  210,
@@ -138,7 +138,6 @@ class GivenEdgesExtraction(BaseEstimator, TransformerMixin):
  705.1660075444291,
  712.7490113166436,
  720.3320150888583,
- 725.2490113166436,
  730.1660075444291,
  740,
  747.7243484748634,
@@ -147,30 +146,28 @@ class GivenEdgesExtraction(BaseEstimator, TransformerMixin):
  770.8973938994536,
  778.3608893423097,
  785.8243847851659,
- 791.9121923925829,
- 798,
+ 792.7855130483395,
+ 799.7466413115131,
  807.5810902304434,
  816.5985296073651,
  825.6159689842868,
- 834.6334083612087,
- 843.6508477381304,
- 861.685726491974,
+ 836.8877682054391,
+ 848.1595674265914,
+ 863.9400863362044,
  879.7206052458175,
- 896.4760317947478,
- 913.231458343678,
+ 905.8611747488183,
  932.0017442518191,
- 950.7720301599602,
+ 950.2522817644435,
  968.5028192770679,
- 986.2336083941757,
+ 995.0990029527295,
  1021.6951866283912,
  1045.622987987501,
- 1069.5507893466106,
+ 1084.7830302704533,
  1123.9430725534057,
  1151.1392141568033,
  1178.3353557602009,
  1203.4127942147347,
  1228.4902326692686,
- 1240.8414534419671,
  1253.1926742146657,
  1265.5438949873642,
  1277.8951157600625,
@@ -182,8 +179,8 @@ class GivenEdgesExtraction(BaseEstimator, TransformerMixin):
  1339.375360225879,
  1347.7457855765365,
  1356.1162109271943,
- 1364.486636277852,
- 1372.8570616285097,
+ 1365.7868972366239,
+ 1375.4575835460535,
  1386.4285308142548,
  1400,
  1408.3298109092373,
@@ -192,35 +189,41 @@ class GivenEdgesExtraction(BaseEstimator, TransformerMixin):
  1433.319243636949,
  1442,
  1448.5,
- 1455,
+ 1454.875,
  1461.25,
- 1467.5,
+ 1470.625,
  1480,
  1490.0,
  1500,
- 1507.5,
+ 1509.375,
  1518.75,
  1530,
- 1540.0,
- 1550,
+ 1546.25,
  1562.5,
  1581.25,
- 1600,
+ 1610,
  1700.0]
     def fit(self, X, y=None):
         return self
     def transform(self, X, y=None):
         # double number of bins
-        new = []
-        for i in range(len(self.edges)):
-            new.append(self.edges[i])
-            if i < len(self.edges)-1:
-                new.append(0.5 * (self.edges[i] + self.edges[i+1]))
+        # new = []
+        # for i in range(len(self.edges)):
+        #     new.append(self.edges[i])
+        #     if i < len(self.edges)-1:
+        #         new.append(0.5 * (self.edges[i] + self.edges[i+1]))
+        #
+        # new2 = []
+        # for i in range(len(new)):
+        #     new2.append(new[i])
+        #     if i < len(new)-1:
+        #         new2.append(0.5 * (new[i] + new[i+1]))
+
 
         X_new = []
         for x in X:
-            X_new.append(np.histogram(x, bins=new)[0])
-            # X_new.append(np.histogram(x, bins=self.edges)[0])
+            # X_new.append(np.histogram(x, bins=new2)[0])
+            X_new.append(np.histogram(x, bins=self.edges)[0])
         return X_new
 
 # Build n bins from hist/distribution of values

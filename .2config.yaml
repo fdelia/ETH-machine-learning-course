@@ -123,14 +123,14 @@ params:
    - module: sklearn.feature_selection
      class: VarianceThreshold
      params:
-       threshold: 0.1
+       threshold: 0.0
 
     # 10 3 mean: 0.881540831507  std: 0.0164859670043
     # 10 5 mean: 0.880186211752  std: 0.0187992062709
-  #  - module: sklearn.linear_model
-  #    class: LinearRegression
-  #    params:
-  #      n_jobs: -1
+   - module: sklearn.linear_model
+     class: LinearRegression
+     params:
+       n_jobs: -1
 
     # binext: mean: 0.81960217199  std: 0.0457805041688
     # clusters samples
@@ -150,14 +150,15 @@ params:
 
   # adding centers
   # 10 3 mean: 0.873334907888  std: 0.0230843653765
-   - module: sklearn.ensemble
-     class: BaggingRegressor
-     params:
-       max_samples: 0.5
-       n_estimators: 10
-      #  base_estimator: sklearn.svm.LinearSVR
-       base_estimator: sklearn.linear_model.LinearRegression
-       n_jobs: -1
+  #  - module: sklearn.ensemble
+  #    class: BaggingRegressor
+  #    params:
+  #     #  max_samples: 0.8
+  #      max_features: 0.8
+  #      n_estimators: 20
+  #     #  base_estimator: sklearn.svm.LinearSVR
+  #      base_estimator: sklearn.linear_model.LinearRegression
+  #      n_jobs: -1
 
     # adding centers
     # 10 3 mean: 0.089928057554  std: 0.0133574639898   ???
@@ -182,7 +183,7 @@ params:
 
  param_grid:
    VarianceThreshold__threshold:
-     - 0.1
+     - 0.0
   #  KernelRidge__kernel:
   #    - 'polynomial'
   #  LinearSVR__dual:
