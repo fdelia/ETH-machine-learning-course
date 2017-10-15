@@ -118,17 +118,15 @@ params:
       #  images_x_to: 130
 
    - module: sklearn.preprocessing
-    #  class: Normalizer
      class: StandardScaler
+    #  class: Normalizer
    - module: sklearn.feature_selection
      class: VarianceThreshold
      params:
-       threshold: 0.01
+       threshold: 0.1
 
-    # 10 2 mean: -0.0024788475812  std: 0.00355764497358
     # 10 3 mean: 0.881540831507  std: 0.0164859670043
     # 10 5 mean: 0.880186211752  std: 0.0187992062709
-
   #  - module: sklearn.linear_model
   #    class: LinearRegression
   #    params:
@@ -152,22 +150,23 @@ params:
 
   # adding centers
   # 10 3 mean: 0.873334907888  std: 0.0230843653765
-  #  - module: sklearn.ensemble
-  #    class: BaggingRegressor
-  #    params:
-  #      max_samples: 0.5
-  #      n_estimators: 10
-  #      base_estimator: sklearn.svm.LinearSVR
-  #      n_jobs: -1
+   - module: sklearn.ensemble
+     class: BaggingRegressor
+     params:
+       max_samples: 0.5
+       n_estimators: 10
+      #  base_estimator: sklearn.svm.LinearSVR
+       base_estimator: sklearn.linear_model.LinearRegression
+       n_jobs: -1
 
     # adding centers
     # 10 3 mean: 0.089928057554  std: 0.0133574639898   ???
     #  8 3 mean: 0.0908273381295  std: 0.0217216529784
-   - module: sklearn.svm
-     class: LinearSVR
-     params:
-       C: 1.5
-       max_iter: 1000
+  #  - module: sklearn.svm
+  #    class: LinearSVR
+  #    params:
+  #      C: 1.5
+  #      max_iter: 1000
 
 
 
