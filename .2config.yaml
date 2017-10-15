@@ -109,20 +109,21 @@ params:
 
 
    - module: ml_project.models.feature_extraction
-     class: ClusteredHistExtraction
-     params:
-       n_clusters: 10
-       n_samples: 3
-       images_x_from: 50
-       images_x_to: 130
+     class: GivenEdgesExtraction
+    #  class: ClusteredHistExtraction
+    #  params:
+    #    n_clusters: 10
+    #    n_samples: 3
+      #  images_x_from: 50
+      #  images_x_to: 130
 
    - module: sklearn.preprocessing
     #  class: Normalizer
      class: StandardScaler
    - module: sklearn.feature_selection
      class: VarianceThreshold
-    #  params:
-    #    threshold: 0.1
+     params:
+       threshold: 0.01
 
     # 10 2 mean: -0.0024788475812  std: 0.00355764497358
     # 10 3 mean: 0.881540831507  std: 0.0164859670043
@@ -137,34 +138,36 @@ params:
     # clusters samples
     # adding centers
     # 3 3  mean: 0.893364733394  std: 0.0251460130129
-    # 10 3 mean: 0.881540831507  std: 0.0164859670043
+    # 10 3 mean: 0.881540831507  std: 0.0164859670043 ??
+    # 10 3 mean: 0.883364794741  std: 0.018861401846
     # 10 5 mean: 0.876532056005  std: 0.0176116013681
     # 5 20 mean: 0.885697215588  std: 0.0320907013732
+    #  8 4 50 130 mean: 0.876480736452  std: 0.0197743122358
     # means of centers
     # 20 3 mean: 0.887983940253  std: 0.0205856500626
-   - module: sklearn.kernel_ridge
-     class: KernelRidge
-     params:
-       kernel: 'polynomial'
+  #  - module: sklearn.kernel_ridge
+  #    class: KernelRidge
+  #    params:
+  #      kernel: 'polynomial'
 
   # adding centers
   # 10 3 mean: 0.873334907888  std: 0.0230843653765
   #  - module: sklearn.ensemble
   #    class: BaggingRegressor
   #    params:
-  #      max_samples: 0.2
+  #      max_samples: 0.5
   #      n_estimators: 10
   #      base_estimator: sklearn.svm.LinearSVR
+  #      n_jobs: -1
 
     # adding centers
     # 10 3 mean: 0.089928057554  std: 0.0133574639898   ???
     #  8 3 mean: 0.0908273381295  std: 0.0217216529784
-  #  - module: sklearn.svm
-  #    class: LinearSVC
-  #    params:
-  #      C: 1.0
-  #      max_iter: 200 # 1000
-
+   - module: sklearn.svm
+     class: LinearSVR
+     params:
+       C: 1.5
+       max_iter: 1000
 
 
 
@@ -175,22 +178,28 @@ params:
   #    class: GradientBoostingRegressor
   #    params:
   #     learning_rate: 0.01
-  #     n_estimators: 1000
+  #     n_estimators: 300
   #     warm_start: True
 
  param_grid:
+   VarianceThreshold__threshold:
+     - 0.1
   #  KernelRidge__kernel:
   #    - 'polynomial'
+  #  LinearSVR__dual:
+  #    - True
+  #    - False
   #  LinearSVR__C:
   #    - 0.5
   #    - 1.0
   #    - 1.5
-   ClusteredHistExtraction__n_clusters:
-     - 8
-     - 10
-   ClusteredHistExtraction__n_samples:
-     - 3
-     - 4
+  #  ClusteredHistExtraction__n_clusters:
+    #  - 8
+    #  - 10
+  #  ClusteredHistExtraction__n_samples:
+  #    - 3
+    #  - 4
+    #  - 4
     #  - 80
   #  HistExtraction__bins:
     #  - 10
