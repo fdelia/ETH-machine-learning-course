@@ -108,12 +108,14 @@ class GivenEdgesExtraction(BaseEstimator, TransformerMixin):
         self.edges = [1,
  180,
  200,
+ 210,
  220,
  240,
  260.59153353677925,
  281.00824805433393,
  296.51672876785585,
  312.41929109857142,
+ 345,
  385.23831822211014,
  458.12983660320458,
  510.43647791541645,
@@ -122,13 +124,15 @@ class GivenEdgesExtraction(BaseEstimator, TransformerMixin):
  655.08349269468147,
  666.54241844275282,
  680,
+ 685,
  690,
  720.33201508885827,
  740,
  770.89739389945362,
  785.82438478516588,
+ 798,
  807.58109023044335,
- 869.72060524581752,
+ 879.72060524581752,
  913.23145834367801,
  919.63925603546056,
  950.7720301599602,
@@ -137,23 +141,27 @@ class GivenEdgesExtraction(BaseEstimator, TransformerMixin):
  1178.3353557602009,
  1228.4902326692686,
  1277.8951157600625,
+ 1300,
  1339.3753602258789,
  1372.8570616285097,
  1400,
  1433.3192436369491,
+ 1442,
  1455,
  1480,
+ 1500,
  1515,
+ 1530,
  1550,
  1600,
- 1800]
+ 1900]
         pass
     def fit(self, X, y=None):
         return self
     def transform(self, X, y=None):
         X_new = []
         for x in X:
-            x_new.append(np.histogram(x, bins=self.edges)[0])
+            X_new.append(np.histogram(x, bins=self.edges)[0])
         return X_new
 
 # Build n bins from hist/distribution of values
