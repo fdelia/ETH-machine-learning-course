@@ -28,12 +28,12 @@ params:
         images_x_to: 130
 
     - module: sklearn.preprocessing
-      class: StandardScaler
+      class: Normalizer
     - module: sklearn.feature_selection
       class: VarianceThreshold
       params:
         threshold: 0.1
-        
+
     - module: sklearn.svm
       class: LinearSVR
       params:
