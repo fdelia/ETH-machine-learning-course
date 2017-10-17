@@ -6,24 +6,53 @@ params:
     #   class: RemoveEmptyValues
 
 
+    # - module: ml_project.models.feature_extraction
+    #   class: BinsExtraction
+    #   params:
+    #     # middle_images_only: True # score: 73.3
+    #     bin_length: 35
+    #     images_x_from: 50
+    #     images_x_to: 120
+    #     images_y_from: 20
+    #     images_y_to: 160
+    #     more_features: False # score:
+    #     del_zero_std: False
+    # - module: ml_project.models.feature_extraction
+    #   class: StatsExtraction
     - module: ml_project.models.feature_extraction
-      class: BinsExtraction
+      #class: GivenEdgesExtraction
+      class: WhatEver
       params:
-        bin_length: 50
-        # middle_images_only: True # score: 73.3
+        splits: 610
         images_x_from: 50
         images_x_to: 130
-        more_features: False # score:
-        del_zero_std: False
 
     - module: sklearn.preprocessing
-      class: Normalizer
-
-    - module: sklearn.linear_model
-      class: LinearRegression
+      class: StandardScaler
+    - module: sklearn.feature_selection
+      class: VarianceThreshold
       params:
-        n_jobs: -1
-    # - module: sklearn.ensemble
+        threshold: 0.1
+        
+    - module: sklearn.svm
+      class: LinearSVR
+      params:
+        C: 10.0
+        # max_iter: 1000
+
+    # - module: sklearn.preprocessing
+    #   class: StandardScaler
+    #
+    # - module: sklearn.kernel_ridge
+    #   class: KernelRidge
+    #   params:
+    #     kernel: 'polynomial'
+
+    # - module: sklearn.linear_model
+    #   class: LinearRegression
+    #   params:
+    #     n_jobs: -1
+    # # - module: sklearn.ensemble
     #   class: GradientBoostingRegressor
     #   params:
     #     learning_rate: 0.01
