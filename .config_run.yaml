@@ -21,23 +21,23 @@ params:
     #   class: StatsExtraction
     - module: ml_project.models.feature_extraction
       #class: GivenEdgesExtraction
-      class: WhatEver
+      class: RandomBinsExtraction
       params:
         splits: 610
         images_x_from: 50
-        images_x_to: 130
+        images_x_to: 132
 
     - module: sklearn.preprocessing
       class: StandardScaler
     - module: sklearn.feature_selection
       class: VarianceThreshold
       params:
-        threshold: 0.2
+        threshold: 0.1
 
     - module: sklearn.svm
       class: LinearSVR
       params:
-        C: 15.0
+        C: 1.0
         max_iter: 2000
 
     # - module: sklearn.preprocessing
